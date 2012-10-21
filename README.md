@@ -32,9 +32,9 @@ To use with TI Stellaris Launchpad Workshop lab 10:
 * Copy source files into drivers directory of your grlib_demo workspace
 * In grlib_demo.c replace Kentec320x240x16_ssd2119_8bit with
 Adafruit320x240x16TouchTFT_ILI9325
-* In CSS remove links to Kentec and Touch from /driver directory (right click
+* In CCS remove links to Kentec and Touch from /driver directory (right click
 delete)
-* In CSS remove include path that points to boards\ek-lm4f120xl
+* In CCS remove include path that points to boards\ek-lm4f120xl
 * Replace main() in grlib_demo.c with the code in main-fragment.c
 
 Limitations:
