@@ -95,7 +95,7 @@
 // Macro to wait x ms
 #define LCD_DELAY(x)			{ SysCtlDelay((x) * (g_ulWait1ms)); }
 
-/* register names from Peter Barrett's / Adafruit's Microtouch code */
+// display controller register names from Peter Barrett's / Adafruit's Microtouch code
 #define ILI_START_OSC 0x00
 #define ILI_DRIV_OUT_CTRL 0x01
 #define ILI_DRIV_WAV_CTRL 0x02
@@ -226,7 +226,6 @@ void LCDWriteData(const unsigned short usData)
 
 	// Strobe WR
 	LCD_WR_ACTIVE
-//	SysCtlDelay(2);
 	LCD_WR_IDLE
 
 	// Send lower byte
@@ -234,7 +233,6 @@ void LCDWriteData(const unsigned short usData)
 
 	// Strobe WR
 	LCD_WR_ACTIVE
-//	SysCtlDelay(10);		// a little delay is needed here to make display init work?? :-(
 	LCD_WR_IDLE
 }
 
@@ -247,7 +245,6 @@ void LCDWriteCommand(const unsigned short usAddress)
 
 	// Strobe WR
 	LCD_WR_ACTIVE
-//	SysCtlDelay(2);
 	LCD_WR_IDLE
 
 	// Send lower byte
@@ -255,10 +252,10 @@ void LCDWriteCommand(const unsigned short usAddress)
 
 	// Strobe WR
 	LCD_WR_ACTIVE
-//	SysCtlDelay(2);
 	LCD_WR_IDLE
 }
 
+// Coordinates of next display write
 void LCDGoto(unsigned short x, unsigned short y)
 {
 	if(x >= LCD_WIDTH) x = LCD_WIDTH - 1;
@@ -282,6 +279,7 @@ void LCDGoto(unsigned short x, unsigned short y)
 	g_usPosY = y;
 }
 
+// Clear display
 void LCDClear(void)
 {
 	LCDGoto(0, 0);
@@ -293,6 +291,7 @@ void LCDClear(void)
 	}
 }
 
+// Configure display controller to write to defined display area
 void LCDAddressWindow(const tRectangle *pRect)
 {
 #ifdef PORTRAIT
@@ -315,10 +314,11 @@ void LCDAddressWindow(const tRectangle *pRect)
 	LCDWriteData(pRect->sXMax);
 #endif
 
-	// Go to first address, physical!
+	// Set pointer to first address in that window
 	LCDGoto(pRect->sXMin, pRect->sYMin);
 }
 
+// Initializing display
 void Adafruit320x240x16_ILI9325Init(void)
 {
 	unsigned short usAddress, usData;
@@ -366,6 +366,7 @@ void Adafruit320x240x16_ILI9325Init(void)
 	LCDWriteData(0);
 	LCD_DELAY(50);
 
+	// Process initialization sequence of display driver
 	int i = 0;
 	while(usInitScript[i] != ILI_STOPCMD)
 	{
@@ -383,11 +384,13 @@ void Adafruit320x240x16_ILI9325Init(void)
 		}
 	}
 
+	// Clear display of any stray pixels
 	LCDClear();
 
 	// Done talking to LCD
 	LCD_CS_IDLE
 
+	// Turn back light on
 	LCD_BKLT_ON
 
 	return;
@@ -395,8 +398,14 @@ void Adafruit320x240x16_ILI9325Init(void)
 
 void Adafruit320x240x16_ILI9325PixelDraw(void *pvDisplayData, long lX, long lY, unsigned long ulValue)
 {
+	// Start talking to LCD
+	LCD_CS_ACTIVE
+
 	LCDGoto(lX, lY);
 	LCDWriteData(ulValue);
+
+	// Done talking to LCD
+	LCD_CS_IDLE
 }
 
 void Adafruit320x240x16_ILI9325PixelDrawMultiple(void *pvDisplayData,
@@ -404,7 +413,11 @@ void Adafruit320x240x16_ILI9325PixelDrawMultiple(void *pvDisplayData,
 												 const unsigned char *pucData,
 												 const unsigned char *pucPalette)
 {
+	// Start talking to LCD
+	LCD_CS_ACTIVE
+
 #ifdef LANDSCAPE
+	// Configure write direction to horizontal
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1038);
 #endif
@@ -488,17 +501,23 @@ void Adafruit320x240x16_ILI9325PixelDrawMultiple(void *pvDisplayData,
     }
 
 #ifdef LANDSCAPE
+	// Reset write direction to default (vertical)
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1030);
 #endif
 
+	// Done talking to LCD
+	LCD_CS_IDLE
 }
 
 void Adafruit320x240x16_ILI9325LineDrawH(void *pvDisplayData,
 										 long lX1, long lX2, long lY, unsigned long ulValue)
 {
+	// Start talking to LCD
+	LCD_CS_ACTIVE
 
 #ifdef LANDSCAPE
+	// 	Configure write direction to horizontal
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1038);
 #endif
@@ -512,15 +531,23 @@ void Adafruit320x240x16_ILI9325LineDrawH(void *pvDisplayData,
 	}
 
 #ifdef LANDSCAPE
+	// Reset write direction to default (vertical)
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1030);
 #endif
+
+	// Done talking to LCD
+	LCD_CS_IDLE
 }
 
 void Adafruit320x240x16_ILI9325LineDrawV(void *pvDisplayData,
 										 long lX, long lY1, long lY2, unsigned long ulValue)
 {
+	// Start talking to LCD
+	LCD_CS_ACTIVE
+
 #ifdef PORTRAIT
+	// Configure write direction to horizontal
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1018);
 #endif
@@ -536,15 +563,19 @@ void Adafruit320x240x16_ILI9325LineDrawV(void *pvDisplayData,
 	}
 
 #ifdef PORTRAIT
+	// Reset write direction to default (vertical)
 	LCDWriteCommand(ILI_ENTRY_MOD);
 	LCDWriteData(0x1030);
 #endif
 
+	// Done talking to LCD
+	LCD_CS_IDLE
 }
 
 void Adafruit320x240x16_ILI9325RectFill(void *pvDisplayData,
 										const tRectangle *pRect, unsigned long ulValue)
 {
+	// Start talking to LCD
 	LCD_CS_ACTIVE
 
 	LCDAddressWindow(pRect);
@@ -559,6 +590,9 @@ void Adafruit320x240x16_ILI9325RectFill(void *pvDisplayData,
 	}
 
 	LCDAddressWindow(&g_FullScreen);
+
+	// Done talking to LCD
+	LCD_CS_IDLE
 }
 
 static unsigned long Adafruit320x240x16_ILI9325ColorTranslate(void *pvDisplayData, unsigned long ulValue)

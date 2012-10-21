@@ -3,13 +3,17 @@ Stellaris grlib driver for Adafruit TFT ILI9235/9238
 
 TI Stellaris Graphics Library driver for Adafruit's 320x240x18 Touch TFT display.
 
-Display
 * http://adafruit.com/products/335
-* 320 x 240 pixel, 18 bit colors
+* 320 x 240 pixels, 18 bit colors
 * ILI9325 or ILI9328 display controller
+* Resistive touch screen
 
-This code was rewritten from scratch with some inspiration from Adafruit's driver
-for Arduino. In particular the initialization sequence was copied verbatim.
+The graphic driver code was rewritten from scratch with some inspiration from
+Adafruit's driver for Arduino. In particular the initialization sequence was
+copied verbatim.
+
+The touch driver code is from the StellarisWare example and extended with 
+calibration functionality.
 
 Wiring of pins is mostly following the Kentec Booster Pack:
 * CS   A.7   chip select
@@ -19,14 +23,22 @@ Wiring of pins is mostly following the Kentec Booster Pack:
 * RST  F.4   reset (not available on Kentec)
 * BKLT F.3   backlight (not available on Kentec)
 * DATA B     data line 0-7 on pins B.0-B.7
+* XP   E.4   touch X+
+* YP   E.5   touch Y+
+* XN   A.3   touch X-
+* YN   A.2   touch Y-
 
 To use with TI Stellaris Launchpad Workshop lab 10:
-* Copy source files into driver directory of grlib_demo workspace
+* Copy source files into drivers directory of your grlib_demo workspace
 * In grlib_demo.c replace Kentec320x240x16_ssd2119_8bit with
 Adafruit320x240x16TouchTFT_ILI9325
+* In CSS remove links to Kentec and Touch from /driver directory (right click
+delete)
+* In CSS remove include path that points to boards\ek-lm4f120xl
+* Replace main() in grlib_demo.c with the code in main-fragment.c
 
 Limitations:
-* This driver only uses 16bit color instead of the available 18bit 
+* This driver only uses 16bit color instead of the full 18bit available
 * PixelDrawMultiple tested only with StellarisWare example (i.e. only for 4bit)
-* No support for touch functionality yet. This display requires different
-calibration data than the Kentec booster pack used as example by TI.
+* In my test setup touch only worked reliable after adding 0.1uF capacitors from
+Y- and X- to GND
