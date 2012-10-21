@@ -72,12 +72,28 @@ main(void)
     // Calculate and set calibration matrix
     //
     long* plCalibrationMatrix = TouchScreenCalibrate();
+    
     //
     // Write out calibration data if successful
     //
     if(plCalibrationMatrix)
     {
-    	//
+    	char pcStringBuf[20];
+    	usprintf(pcStringBuf, "A %d", plCalibrationMatrix[0]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 20, 1);
+    	usprintf(pcStringBuf, "B %d", plCalibrationMatrix[1]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 40, 1);
+    	usprintf(pcStringBuf, "C %d", plCalibrationMatrix[2]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 60, 1);
+    	usprintf(pcStringBuf, "D %d", plCalibrationMatrix[3]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 80, 1);
+    	usprintf(pcStringBuf, "E %d", plCalibrationMatrix[4]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 100, 1);
+    	usprintf(pcStringBuf, "F %d", plCalibrationMatrix[5]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 120, 1);
+    	usprintf(pcStringBuf, "Div %d", plCalibrationMatrix[6]);
+    	GrStringDraw(&sContext, pcStringBuf, -1, 0, 140, 1);
+    	TouchScreenCalibrationPoint(0,0,0);	// wait for dummy touch
     }
 
     //
