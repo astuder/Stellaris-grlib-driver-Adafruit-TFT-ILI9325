@@ -581,7 +581,7 @@ void Adafruit320x240x16_ILI9325RectFill(void *pvDisplayData,
 	LCDAddressWindow(pRect);
 
 	int i = 0;
-	int pixel = (pRect->sXMax+1) * (pRect->sYMax+1);
+	int pixel = (pRect->sXMax - pRect->sXMin + 1) * (pRect->sYMax - pRect->sYMin + 1);	// bug fix by jks-liu on github
 
 	while(i < pixel)
 	{
